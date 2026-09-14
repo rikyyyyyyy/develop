@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fukumatch（フクマッチ）- いらない服を、誰かのお気に入りに。</title>
+<meta name="description" content="fukumatchは服のマッチングサービス。いらない服をスワイプして、マッチしたら会って交換。サステナブルなファッション体験を。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;600;700;900&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+/* ========== RESET & BASE ========== */
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{font-family:'Noto Sans JP','Inter',sans-serif;color:#1a1a2e;background:#fff;overflow-x:hidden;line-height:1.8}
+a{text-decoration:none;color:inherit}
+img{max-width:100%}
+ul{list-style:none}
+::selection{background:#ff6b6b;color:#fff}
+
+/* ========== UTILITY ========== */
+.container{max-width:1100px;margin:0 auto;padding:0 24px}
+.section-title{font-size:clamp(1.6rem,4vw,2.4rem);font-weight:900;text-align:center;margin-bottom:12px;letter-spacing:-0.02em}
+.section-sub{text-align:center;color:#666;font-size:0.95rem;margin-bottom:50px;max-width:600px;margin-left:auto;margin-right:auto}
+.gradient-text{background:linear-gradient(135deg,#ff6b6b,#ee5a24,#f0932b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.fade-up{opacity:0;transform:translateY(40px);transition:opacity 0.7s ease,transform 0.7s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* ========== NAV ========== */
+nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:0 24px;transition:background 0.3s,box-shadow 0.3s}
+nav.scrolled{background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);box-shadow:0 1px 20px rgba(0,0,0,0.06)}
+.nav-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:70px}
+.logo{font-family:'Inter',sans-serif;font-size:1.5rem;font-weight:900;letter-spacing:-0.03em}
+.logo span{color:#ff6b6b}
+.nav-links{display:flex;gap:32px;align-items:center}
+.nav-links a{font-size:0.85rem;font-weight:600;color:#555;transition:color 0.2s}
+.nav-links a:hover{color:#ff6b6b}
+.nav-cta{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff!important;padding:10px 24px;border-radius:50px;font-size:0.82rem;transition:transform 0.2s,box-shadow 0.2s}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,107,107,0.4)}
+.menu-toggle{display:none;background:none;border:none;font-size:1.5rem;cursor:pointer;color:#333}
+
+/* ========== HERO ========== */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;background:linear-gradient(160deg,#fff5f5 0%,#fff 40%,#f8f9ff 100%)}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;padding:100px 0 80px}
+.hero-text h1{font-size:clamp(2.2rem,5.5vw,3.6rem);font-weight:900;line-height:1.25;letter-spacing:-0.03em;margin-bottom:20px}
+.hero-text h1 .accent{background:linear-gradient(135deg,#ff6b6b,#ee5a24);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-text p{font-size:1.05rem;color:#555;margin-bottom:35px;line-height:1.9;max-width:480px}
+.hero-buttons{display:flex;gap:14px;flex-wrap:wrap}
+.btn-primary{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff;padding:16px 36px;border-radius:50px;font-weight:700;font-size:0.95rem;border:none;cursor:pointer;transition:all 0.3s;box-shadow:0 8px 30px rgba(255,107,107,0.3);font-family:inherit}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(255,107,107,0.45)}
+.btn-secondary{background:transparent;color:#333;padding:16px 36px;border-radius:50px;font-weight:700;font-size:0.95rem;border:2px solid #ddd;cursor:pointer;transition:all 0.3s;font-family:inherit}
+.btn-secondary:hover{border-color:#ff6b6b;color:#ff6b6b}
+
+/* Hero Phone Mockup */
+.hero-visual{display:flex;justify-content:center;position:relative}
+.phone-frame{width:280px;height:540px;background:#1a1a2e;border-radius:36px;padding:12px;position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.15),0 0 0 2px rgba(0,0,0,0.1);transform:perspective(800px) rotateY(-8deg) rotateX(3deg)}
+.phone-screen{width:100%;height:100%;background:#fff;border-radius:26px;overflow:hidden;position:relative}
+.phone-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:120px;height:28px;background:#1a1a2e;border-radius:0 0 18px 18px;z-index:5}
+
+/* Floating elements around hero */
+.float-element{position:absolute;border-radius:16px;opacity:0.08;animation:floatAround 8s ease-in-out infinite}
+.float-element:nth-child(1){width:100px;height:100px;background:#ff6b6b;top:15%;right:8%;animation-delay:0s}
+.float-element:nth-child(2){width:60px;height:60px;background:#f0932b;bottom:20%;left:5%;animation-delay:2s}
+.float-element:nth-child(3){width:80px;height:80px;background:#ee5a24;top:40%;left:10%;animation-delay:4s}
+@keyframes floatAround{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-25px) rotate(5deg)}}
+
+/* ========== CONCEPT ========== */
+.concept{padding:100px 0;background:#fafafa}
+.concept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:30px;text-align:center}
+.concept-step{padding:40px 20px;position:relative}
+.concept-icon{width:80px;height:80px;margin:0 auto 20px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:2rem;background:linear-gradient(135deg,#fff5f5,#fff);box-shadow:0 8px 30px rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.1)}
+.concept-step h4{font-size:1.1rem;font-weight:700;margin-bottom:8px}
+.concept-step p{font-size:0.85rem;color:#777;line-height:1.7}
+.step-number{position:absolute;top:10px;left:50%;transform:translateX(-50%);font-family:'Inter';font-size:4rem;font-weight:900;color:rgba(255,107,107,0.06);pointer-events:none}
+.concept-arrow{display:flex;align-items:center;justify-content:center;color:#ddd;font-size:1.5rem;padding-top:30px}
+
+/* ========== FEATURES ========== */
+.features{padding:100px 0}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.feature-card{padding:35px 28px;border-radius:20px;border:1px solid #f0f0f0;transition:all 0.3s;background:#fff;position:relative;overflow:hidden}
+.feature-card:hover{transform:translateY(-5px);box-shadow:0 15px 50px rgba(0,0,0,0.06);border-color:transparent}
+.feature-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ff6b6b,#f0932b);opacity:0;transition:opacity 0.3s}
+.feature-card:hover::after{opacity:1}
+.feature-icon{font-size:1.8rem;margin-bottom:16px;display:block}
+.feature-card h4{font-size:1rem;font-weight:700;margin-bottom:8px}
+.feature-card p{font-size:0.82rem;color:#777;line-height:1.7}
+
+/* ========== DEMO SECTION ========== */
+.demo-section{padding:100px 0;background:linear-gradient(160deg,#1a1a2e 0%,#16213e 100%);color:#fff;overflow:hidden}
+.demo-section .section-sub{color:rgba(255,255,255,0.5)}
+.demo-layout{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+.demo-info h3{font-size:1.6rem;font-weight:700;margin-bottom:16px}
+.demo-info p{color:rgba(255,255,255,0.6);font-size:0.9rem;margin-bottom:30px;line-height:1.9}
+.demo-info .demo-tags{display:flex;gap:10px;flex-wrap:wrap}
+.demo-tag{padding:6px 16px;border-radius:20px;font-size:0.75rem;font-weight:600;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.7)}
+
+/* Swipe Demo */
+.swipe-area{display:flex;justify-content:center;align-items:center;min-height:420px;position:relative}
+.card-stack{position:relative;width:280px;height:380px}
+.swipe-card{position:absolute;width:280px;height:380px;border-radius:20px;cursor:grab;user-select:none;transition:transform 0.1s,box-shadow 0.3s;box-shadow:0 10px 40px rgba(0,0,0,0.3);overflow:hidden;background:#fff;color:#333;touch-action:none}
+.swipe-card:active{cursor:grabbing}
+.swipe-card .card-image{height:55%;position:relative;display:flex;align-items:center;justify-content:center;font-size:5rem}
+.swipe-card .card-body{padding:18px 20px;height:45%}
+.swipe-card .card-body h4{font-size:1rem;font-weight:700;margin-bottom:4px;color:#1a1a2e}
+.swipe-card .card-body .card-meta{font-size:0.75rem;color:#999;margin-bottom:10px}
+.swipe-card .card-body .card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.swipe-card .card-body .card-tag{padding:3px 10px;border-radius:12px;font-size:0.68rem;font-weight:600;background:#f5f5f5;color:#555}
+.card-overlay{position:absolute;top:20px;padding:8px 20px;border-radius:8px;font-size:1.1rem;font-weight:900;opacity:0;transition:opacity 0.1s;z-index:5;border:3px solid}
+.card-overlay.like{right:20px;color:#00c853;border-color:#00c853;transform:rotate(15deg)}
+.card-overlay.nope{left:20px;color:#ff1744;border-color:#ff1744;transform:rotate(-15deg)}
+.swipe-buttons{display:flex;gap:20px;justify-content:center;margin-top:20px}
+.swipe-btn{width:56px;height:56px;border-radius:50%;border:2px solid;display:flex;align-items:center;justify-content:center;font-size:1.4rem;cursor:pointer;transition:all 0.2s;background:rgba(255,255,255,0.05)}
+.swipe-btn.nope-btn{border-color:rgba(255,23,68,0.4);color:#ff1744}
+.swipe-btn.nope-btn:hover{background:rgba(255,23,68,0.15);transform:scale(1.1)}
+.swipe-btn.like-btn{border-color:rgba(0,200,83,0.4);color:#00c853}
+.swipe-btn.like-btn:hover{background:rgba(0,200,83,0.15);transform:scale(1.1)}
+.match-overlay{position:absolute;inset:0;background:rgba(26,26,46,0.95);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.4s;border-radius:20px;z-index:20}
+.match-overlay.show{opacity:1;pointer-events:auto}
+.match-overlay h3{font-size:2rem;font-weight:900;background:linear-gradient(135deg,#ff6b6b,#f0932b);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
+.match-overlay p{color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:20px}
+.match-btn{background:linear-gradient(135deg,#ff6b6b,#ee5a24);color:#fff;border:none;padding:12px 30px;border-radius:50px;font-weight:700;cursor:pointer;font-family:inherit;font-size:0.9rem}
+
+/* ========== IMPACT ========== */
+.impact{padding:100px 0;background:#fafafa}
+.impact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center}
+.impact-card{padding:40px 20px}
+.impact-number{font-family:'Inter';font-size:2.8rem;font-weight:900;background:linear-gradient(135deg,#ff6b6b,#f0932b);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.impact-label{font-size:0.8rem;color:#888;margin-top:6px}
+
+/* ========== CTA ========== */
+.cta-section{padding:100px 0;text-align:center;position:relative;overflow:hidden}
+.cta-section::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,#ff6b6b08,#f0932b08);pointer-events:none}
+.cta-section h2{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;margin-bottom:16px}
+.cta-section p{color:#666;margin-bottom:40px;font-size:1rem}
+.cta-badges{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.badge{display:flex;align-items:center;gap:10px;background:#1a1a2e;color:#fff;padding:14px 28px;border-radius:12px;font-size:0.85rem;font-weight:600;transition:transform 0.2s;cursor:pointer}
+.badge:hover{transform:translateY(-2px)}
+.badge-icon{font-size:1.5rem}
+.badge-text .small{font-size:0.6rem;font-weight:400;opacity:0.7;display:block}
+
+/* ========== FAQ ========== */
+.faq{padding:100px 0}
+.faq-list{max-width:700px;margin:0 auto}
+.faq-item{border-bottom:1px solid #eee;padding:20px 0}
+.faq-q{display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-weight:700;font-size:0.95rem;transition:color 0.2s}
+.faq-q:hover{color:#ff6b6b}
+.faq-q::after{content:'+';font-size:1.3rem;font-weight:300;transition:transform 0.3s;color:#ccc}
+.faq-item.open .faq-q::after{transform:rotate(45deg);color:#ff6b6b}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.4s ease,padding 0.4s;font-size:0.85rem;color:#777;line-height:1.8}
+.faq-item.open .faq-a{max-height:200px;padding-top:12px}
+
+/* ========== FOOTER ========== */
+footer{background:#1a1a2e;color:#fff;padding:60px 0 30px}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:40px}
+.footer-brand .logo{font-size:1.3rem;margin-bottom:12px}
+.footer-brand p{font-size:0.8rem;color:rgba(255,255,255,0.4);line-height:1.8}
+.footer-col h5{font-size:0.8rem;font-weight:700;margin-bottom:16px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.5)}
+.footer-col a{display:block;font-size:0.82rem;color:rgba(255,255,255,0.6);padding:4px 0;transition:color 0.2s}
+.footer-col a:hover{color:#ff6b6b}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.06);padding-top:24px;display:flex;justify-content:space-between;align-items:center;font-size:0.75rem;color:rgba(255,255,255,0.3)}
+.footer-social{display:flex;gap:16px}
+.footer-social a{font-size:1.1rem;color:rgba(255,255,255,0.4);transition:color 0.2s}
+.footer-social a:hover{color:#ff6b6b}
+
+/* ========== RESPONSIVE ========== */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;text-align:center;gap:40px}
+  .hero-text p{margin-left:auto;margin-right:auto}
+  .hero-buttons{justify-content:center}
+  .phone-frame{transform:perspective(800px) rotateY(0) rotateX(0)}
+  .concept-grid{grid-template-columns:1fr}
+  .concept-arrow{display:none}
+  .feature-grid{grid-template-columns:1fr 1fr}
+  .demo-layout{grid-template-columns:1fr;text-align:center}
+  .demo-info .demo-tags{justify-content:center}
+  .impact-grid{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .nav-links{display:none;position:absolute;top:70px;left:0;right:0;background:#fff;flex-direction:column;padding:20px;gap:16px;box-shadow:0 10px 40px rgba(0,0,0,0.1)}
+  .nav-links.open{display:flex}
+  .menu-toggle{display:block}
+  .feature-grid{grid-template-columns:1fr}
+  .impact-grid{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .swipe-card{width:260px;height:360px}
+  .card-stack{width:260px;height:360px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-inner">
+    <a href="#" class="logo">fuku<span>match.</span></a>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">☰</button>
+    <div class="nav-links">
+      <a href="#concept">使い方</a>
+      <a href="#features">特徴</a>
+      <a href="#demo">体験する</a>
+      <a href="#faq">FAQ</a>
+      <a href="#cta" class="nav-cta">事前登録</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="float-element"></div>
+  <div class="float-element"></div>
+  <div class="float-element"></div>
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-text fade-up">
+        <h1>いらない服を、<br>誰かの<span class="accent">お気に入り</span>に。</h1>
+        <p>スワイプで気になる服を選んで、マッチしたら会って交換。<br>サステナブルで、新しいファッション体験がここに。</p>
+        <div class="hero-buttons">
+          <button class="btn-primary" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">事前登録する</button>
+          <button class="btn-secondary" onclick="document.getElementById('demo').scrollIntoView({behavior:'smooth'})">体験デモ ▶</button>
+        </div>
+      </div>
+      <div class="hero-visual fade-up">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen" id="phone-screen">
+            <div style="padding:38px 16px 10px;height:100%;display:flex;flex-direction:column">
+              <div style="text-align:center;font-size:0.7rem;color:#999;margin-bottom:8px">東京 · 2km以内</div>
+              <div style="flex:1;background:linear-gradient(135deg,#ffecd2,#fcb69f);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;overflow:hidden" id="hero-card">
+                👕
+                <div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.6));padding:16px;color:#fff;text-align:left">
+                  <div style="font-weight:700;font-size:0.9rem">ヴィンテージ デニムジャケット</div>
+                  <div style="font-size:0.7rem;opacity:0.8">サイズ M · 美品 · 渋谷区</div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:center;gap:16px;padding:12px 0">
+                <div style="width:44px;height:44px;border-radius:50%;border:2px solid #ff6b6b;display:flex;align-items:center;justify-content:center;font-size:1.2rem">✕</div>
+                <div style="width:44px;height:44px;border-radius:50%;border:2px solid #00c853;display:flex;align-items:center;justify-content:center;font-size:1.2rem">♥</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPT / HOW IT WORKS -->
+<section class="concept" id="concept">
+  <div class="container">
+    <div class="section-title fade-up">服の<span class="gradient-text">マッチング</span>、はじめよう</div>
+    <p class="section-sub fade-up">たった4ステップで、クローゼットに眠る服が誰かの宝物に変わります。</p>
+    <div class="concept-grid">
+      <div class="concept-step fade-up">
+        <div class="step-number">01</div>
+        <div class="concept-icon">📸</div>
+        <h4>服を撮影</h4>
+        <p>クローゼットから着なくなった服を選んで、写真を撮ってアップロード。サイズや状態も簡単に入力。</p>
+      </div>
+      <div class="concept-step fade-up">
+        <div class="step-number">02</div>
+        <div class="concept-icon">👆</div>
+        <h4>スワイプで選ぶ</h4>
+        <p>他のユーザーの服が表示されます。気になったら右スワイプ。興味がなければ左にスワイプ。</p>
+      </div>
+      <div class="concept-step fade-up">
+        <div class="step-number">03</div>
+        <div class="concept-icon">💕</div>
+        <h4>マッチング成立</h4>
+        <p>お互いの服が気に入ったらマッチ成立！チャットで待ち合わせ場所を決めましょう。</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:20px" class="fade-up">
+      <div class="concept-icon" style="margin:0 auto;background:linear-gradient(135deg,#ff6b6b,#f0932b)">
+        <span style="font-size:1.6rem">🤝</span>
+      </div>
+      <h4 style="margin-top:14px;font-size:1.1rem;font-weight:700">会って交換</h4>
+      <p style="font-size:0.85rem;color:#777;max-width:320px;margin:8px auto 0">実際に会って服を交換。新しい出会いと、新しいスタイルが同時に手に入ります。</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-title fade-up">なぜ<span class="gradient-text">fukumatch</span>？</div>
+    <p class="section-sub fade-up">ただの交換アプリではありません。ファッションと環境を考える、新しいプラットフォームです。</p>
+    <div class="feature-grid">
+      <div class="feature-card fade-up">
+        <span class="feature-icon">🌱</span>
+        <h4>サステナブル</h4>
+        <p>年間約48万トンの衣類が廃棄されています。交換でファッション廃棄を減らし、地球にやさしい選択を。</p>
+      </div>
+      <div class="feature-card fade-up">
+        <span class="feature-icon">💰</span>
+        <h4>完全無料</h4>
+        <p>お金のやり取りは一切なし。服と服の等価交換だから、気軽にスタイルチェンジが楽しめます。</p>
+      </div>
+      <div class="feature-card fade-up">
+        <span class="feature-icon">📍</span>
+        <h4>ローカルマッチ</h4>
+        <p>近くのユーザーを優先表示。配送不要で直接会えるから、エコで安心。コミュニティが広がります。</p>
+      </div>
+      <div class="feature-card fade-up">
+        <span class="feature-icon">🛡️</span>
+        <h4>安心・安全</h4>
+        <p>本人確認・評価システム・安全な待ち合わせスポット提案で、安心して交換を楽しめます。</p>
+      </div>
+      <div class="feature-card fade-up">
+        <span class="feature-icon">🎨</span>
+        <h4>AIスタイル提案</h4>
+        <p>あなたの好みを学習して、ぴったりの服を提案。新しいスタイルとの出会いをAIがサポート。</p>
+      </div>
+      <div class="feature-card fade-up">
+        <span class="feature-icon">✨</span>
+        <h4>ブランド品も</h4>
+        <p>ハイブランドからユニクロまで。カテゴリ・ブランド検索で探しているアイテムがすぐ見つかります。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO SECTION -->
+<section class="demo-section" id="demo">
+  <div class="container">
+    <div class="section-title fade-up" style="color:#fff">スワイプを<span class="gradient-text">体験</span>してみよう</div>
+    <p class="section-sub fade-up">実際にカードをドラッグしてスワイプ！右なら「いいね」、左なら「パス」。</p>
+    <div class="demo-layout">
+      <div class="demo-info fade-up">
+        <h3>直感で選ぶ。<br>それだけでいい。</h3>
+        <p>欲しい服が見つかったら右にスワイプ。相手もあなたの服を気に入れば、マッチング成立。チャットで待ち合わせを決めて、実際に会って交換しましょう。</p>
+        <div class="demo-tags">
+          <span class="demo-tag">👕 トップス</span>
+          <span class="demo-tag">👖 ボトムス</span>
+          <span class="demo-tag">👗 ワンピース</span>
+          <span class="demo-tag">👟 シューズ</span>
+          <span class="demo-tag">👜 バッグ</span>
+          <span class="demo-tag">🧥 アウター</span>
+        </div>
+      </div>
+      <div class="swipe-area fade-up">
+        <div class="card-stack" id="card-stack">
+          <!-- Cards inserted by JS -->
+        </div>
+        <div class="match-overlay" id="match-overlay">
+          <h3>🎉 MATCH!</h3>
+          <p>お互いの服が気に入りました！</p>
+          <button class="match-btn" onclick="dismissMatch()">待ち合わせを決める →</button>
+        </div>
+        <div class="swipe-buttons">
+          <button class="swipe-btn nope-btn" onclick="swipeAction('left')">✕</button>
+          <button class="swipe-btn like-btn" onclick="swipeAction('right')">♥</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section class="impact" id="impact">
+  <div class="container">
+    <div class="section-title fade-up">ファッションの<span class="gradient-text">未来</span>を変える</div>
+    <p class="section-sub fade-up">一枚の服を交換するだけで、大きなインパクトが生まれます。</p>
+    <div class="impact-grid">
+      <div class="impact-card fade-up">
+        <div class="impact-number" data-target="2300">0</div>
+        <div class="impact-label">リットルの水を節約 / 1着</div>
+      </div>
+      <div class="impact-card fade-up">
+        <div class="impact-number" data-target="23">0</div>
+        <div class="impact-label">kgのCO₂を削減 / 1着</div>
+      </div>
+      <div class="impact-card fade-up">
+        <div class="impact-number" data-target="48">0</div>
+        <div class="impact-label">万トンの衣類廃棄 / 年</div>
+      </div>
+      <div class="impact-card fade-up">
+        <div class="impact-number" data-target="100">0</div>
+        <div class="impact-label">％無料で利用可能</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-title fade-up">よくある<span class="gradient-text">質問</span></div>
+    <p class="section-sub fade-up">fukumatchについて、よくいただくご質問にお答えします。</p>
+    <div class="faq-list">
+      <div class="faq-item fade-up">
+        <div class="faq-q" onclick="toggleFaq(this)">本当に無料ですか？</div>
+        <div class="faq-a">はい、完全無料です。服と服の交換なので、お金のやり取りは一切発生しません。アプリの利用料・手数料もかかりません。</div>
+      </div>
+      <div class="faq-item fade-up">
+        <div class="faq-q" onclick="toggleFaq(this)">どうやって安全性を確保していますか？</div>
+        <div class="faq-a">本人確認（電話番号・身分証明書）、ユーザー評価システム、カフェやコワーキングスペースなど公共の場での待ち合わせ提案を実施しています。違反報告機能も完備しています。</div>
+      </div>
+      <div class="faq-item fade-up">
+        <div class="faq-q" onclick="toggleFaq(this)">どんな服でも交換できますか？</div>
+        <div class="faq-a">基本的には着用可能な状態の服であれば交換可能です。著しい汚れや破損がある場合は出品をお断りする場合があります。ブランド品の真贋チェックも導入予定です。</div>
+      </div>
+      <div class="faq-item fade-up">
+        <div class="faq-q" onclick="toggleFaq(this)">対応エリアはどこですか？</div>
+        <div class="faq-a">まずは東京23区からスタートし、順次全国に拡大予定です。事前登録いただいた地域から優先的にサービスを開始します。</div>
+      </div>
+      <div class="faq-item fade-up">
+        <div class="faq-q" onclick="toggleFaq(this)">服のサイズが合わなかった場合は？</div>
+        <div class="faq-a">事前にサイズ情報を詳しく記載する仕組みがあります。万が一合わなかった場合は、再度交換に出すことができます。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="container">
+    <div class="fade-up">
+      <h2>あなたの<span class="gradient-text">クローゼット</span>を<br>世界とシェアしよう</h2>
+      <p>2026年冬 リリース予定。事前登録で先行アクセスをゲット。</p>
+      <div style="max-width:420px;margin:0 auto 30px;display:flex;gap:8px">
+        <input type="email" placeholder="メールアドレスを入力" style="flex:1;padding:16px 20px;border:2px solid #eee;border-radius:50px;font-size:0.9rem;font-family:inherit;outline:none;transition:border 0.3s" onfocus="this.style.borderColor='#ff6b6b'" onblur="this.style.borderColor='#eee'" id="email-input">
+        <button class="btn-primary" style="white-space:nowrap;padding:16px 28px" onclick="submitEmail()">登録</button>
+      </div>
+      <div id="email-success" style="display:none;color:#00c853;font-size:0.85rem;margin-bottom:20px">✅ 登録ありがとうございます！リリース時にお知らせします。</div>
+      <div class="cta-badges">
+        <div class="badge">
+          <span class="badge-icon">🍎</span>
+          <span class="badge-text"><span class="small">Coming soon on</span>App Store</span>
+        </div>
+        <div class="badge">
+          <span class="badge-icon">▶️</span>
+          <span class="badge-text"><span class="small">Coming soon on</span>Google Play</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">fuku<span style="color:#ff6b6b">match.</span></div>
+        <p>いらない服を、誰かのお気に入りに。<br>サステナブルなファッション交換プラットフォーム。</p>
+      </div>
+      <div class="footer-col">
+        <h5>サービス</h5>
+        <a href="#concept">使い方</a>
+        <a href="#features">特徴</a>
+        <a href="#demo">デモ</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h5>会社情報</h5>
+        <a href="#">会社概要</a>
+        <a href="#">採用情報</a>
+        <a href="#">プレスキット</a>
+        <a href="#">お問い合わせ</a>
+      </div>
+      <div class="footer-col">
+        <h5>法的情報</h5>
+        <a href="#">利用規約</a>
+        <a href="#">プライバシーポリシー</a>
+        <a href="#">特定商取引法</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 fukumatch Inc. All rights reserved.</span>
+      <div class="footer-social">
+        <a href="#" title="X (Twitter)">𝕏</a>
+        <a href="#" title="Instagram">📷</a>
+        <a href="#" title="TikTok">🎵</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ========== NAVIGATION SCROLL ==========
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 50);
+});
+
+// ========== INTERSECTION OBSERVER (FADE-UP) ==========
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+// ========== COUNTER ANIMATION ==========
+const counterObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const target = parseInt(el.dataset.target);
+    const duration = 2000;
+    const start = performance.now();
+    function tick(now) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.floor(target * eased).toLocaleString();
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+    counterObserver.unobserve(el);
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.impact-number').forEach(el => counterObserver.observe(el));
+
+// ========== FAQ TOGGLE ==========
+function toggleFaq(el) {
+  el.parentElement.classList.toggle('open');
+}
+
+// ========== EMAIL SUBMIT ==========
+function submitEmail() {
+  const input = document.getElementById('email-input');
+  if (input.value && input.value.includes('@')) {
+    document.getElementById('email-success').style.display = 'block';
+    input.value = '';
+    input.style.borderColor = '#00c853';
+    setTimeout(() => { input.style.borderColor = '#eee'; }, 2000);
+  } else {
+    input.style.borderColor = '#ff1744';
+    setTimeout(() => { input.style.borderColor = '#eee'; }, 1500);
+  }
+}
+
+// ========== SWIPE DEMO ==========
+const clothingItems = [
+  { name: 'ヴィンテージ デニムジャケット', meta: 'サイズ M · 美品 · 渋谷区', emoji: '🧥', gradient: 'linear-gradient(135deg,#667eea,#764ba2)', tags: ['デニム','ヴィンテージ','M'] },
+  { name: 'オーバーサイズ 白Tシャツ', meta: 'サイズ L · ほぼ新品 · 新宿区', emoji: '👕', gradient: 'linear-gradient(135deg,#f5f7fa,#c3cfe2)', tags: ['Tシャツ','ユニセックス','L'] },
+  { name: 'フローラル ロングスカート', meta: 'サイズ S · 良品 · 目黒区', emoji: '👗', gradient: 'linear-gradient(135deg,#ffecd2,#fcb69f)', tags: ['スカート','花柄','S'] },
+  { name: 'レザー ライダースジャケット', meta: 'サイズ M · やや使用感 · 世田谷区', emoji: '🧥', gradient: 'linear-gradient(135deg,#434343,#000)', tags: ['レザー','アウター','M'] },
+  { name: 'ナイキ エアマックス 90', meta: '27cm · 美品 · 港区', emoji: '👟', gradient: 'linear-gradient(135deg,#11998e,#38ef7d)', tags: ['スニーカー','Nike','27cm'] },
+  { name: 'カシミヤ ニットセーター', meta: 'サイズ M · ほぼ新品 · 千代田区', emoji: '🧶', gradient: 'linear-gradient(135deg,#f093fb,#f5576c)', tags: ['ニット','カシミヤ','M'] },
+  { name: 'チェック柄 シャツ', meta: 'サイズ L · 良品 · 品川区', emoji: '👔', gradient: 'linear-gradient(135deg,#4facfe,#00f2fe)', tags: ['シャツ','チェック','L'] },
+  { name: 'ワイドパンツ ベージュ', meta: 'サイズ M · 美品 · 中野区', emoji: '👖', gradient: 'linear-gradient(135deg,#d4a574,#c2956b)', tags: ['パンツ','ワイド','M'] },
+];
+
+let currentIndex = 0;
+let isDragging = false;
+let startX = 0, startY = 0, currentX = 0;
+
+function createCard(item, index) {
+  const card = document.createElement('div');
+  card.className = 'swipe-card';
+  card.style.zIndex = 100 - index;
+  card.style.transform = `scale(${1 - index * 0.04}) translateY(${index * 8}px)`;
+  if (index > 0) card.style.pointerEvents = 'none';
+
+  card.innerHTML = `
+    <div class="card-overlay like">LIKE</div>
+    <div class="card-overlay nope">NOPE</div>
+    <div class="card-image" style="background:${item.gradient}">${item.emoji}</div>
+    <div class="card-body">
+      <h4>${item.name}</h4>
+      <div class="card-meta">${item.meta}</div>
+      <div class="card-tags">${item.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
+    </div>
+  `;
+
+  // Touch/Mouse events
+  const onStart = (e) => {
+    if (index !== currentIndex % clothingItems.length) return;
+    isDragging = true;
+    const point = e.touches ? e.touches[0] : e;
+    startX = point.clientX;
+    startY = point.clientY;
+    card.style.transition = 'none';
+  };
+
+  const onMove = (e) => {
+    if (!isDragging) return;
+    const point = e.touches ? e.touches[0] : e;
+    currentX = point.clientX - startX;
+    const rotate = currentX * 0.08;
+    card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+
+    const likeOverlay = card.querySelector('.card-overlay.like');
+    const nopeOverlay = card.querySelector('.card-overlay.nope');
+    if (currentX > 30) {
+      likeOverlay.style.opacity = Math.min((currentX - 30) / 80, 1);
+      nopeOverlay.style.opacity = 0;
+    } else if (currentX < -30) {
+      nopeOverlay.style.opacity = Math.min((-currentX - 30) / 80, 1);
+      likeOverlay.style.opacity = 0;
+    } else {
+      likeOverlay.style.opacity = 0;
+      nopeOverlay.style.opacity = 0;
+    }
+  };
+
+  const onEnd = () => {
+    if (!isDragging) return;
+    isDragging = false;
+    card.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+
+    if (currentX > 100) {
+      flyOut(card, 'right');
+    } else if (currentX < -100) {
+      flyOut(card, 'left');
+    } else {
+      card.style.transform = 'scale(1) translateY(0)';
+      card.querySelector('.card-overlay.like').style.opacity = 0;
+      card.querySelector('.card-overlay.nope').style.opacity = 0;
+    }
+    currentX = 0;
+  };
+
+  card.addEventListener('mousedown', onStart);
+  card.addEventListener('touchstart', onStart, { passive: true });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, { passive: true });
+  document.addEventListener('mouseup', onEnd);
+  document.addEventListener('touchend', onEnd);
+
+  return card;
+}
+
+function flyOut(card, direction) {
+  const flyX = direction === 'right' ? 600 : -600;
+  const flyR = direction === 'right' ? 30 : -30;
+  card.style.transform = `translateX(${flyX}px) rotate(${flyR}deg)`;
+  card.style.opacity = '0';
+
+  // Random match (30% chance on like)
+  const isMatch = direction === 'right' && Math.random() < 0.3;
+
+  setTimeout(() => {
+    card.remove();
+    currentIndex++;
+    updateCardStack();
+    if (isMatch) showMatch();
+  }, 400);
+}
+
+function swipeAction(direction) {
+  const stack = document.getElementById('card-stack');
+  const topCard = stack.firstElementChild;
+  if (!topCard || topCard.classList.contains('swiping')) return;
+  topCard.classList.add('swiping');
+  topCard.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+  flyOut(topCard, direction);
+}
+
+function updateCardStack() {
+  const stack = document.getElementById('card-stack');
+  // Add new cards if needed
+  while (stack.children.length < 3) {
+    const idx = (currentIndex + stack.children.length) % clothingItems.length;
+    const card = createCard(clothingItems[idx], stack.children.length);
+    stack.appendChild(card);
+  }
+  // Update transforms
+  Array.from(stack.children).forEach((card, i) => {
+    card.style.zIndex = 100 - i;
+    card.style.transition = 'transform 0.3s ease';
+    card.style.transform = `scale(${1 - i * 0.04}) translateY(${i * 8}px)`;
+    card.style.opacity = '1';
+    card.style.pointerEvents = i === 0 ? 'auto' : 'none';
+  });
+}
+
+function showMatch() {
+  document.getElementById('match-overlay').classList.add('show');
+}
+function dismissMatch() {
+  document.getElementById('match-overlay').classList.remove('show');
+}
+
+// Initialize swipe demo
+function initSwipeDemo() {
+  const stack = document.getElementById('card-stack');
+  stack.innerHTML = '';
+  currentIndex = 0;
+  for (let i = 0; i < 3; i++) {
+    stack.appendChild(createCard(clothingItems[i], i));
+  }
+}
+initSwipeDemo();
+
+// ========== HERO PHONE CARD ANIMATION ==========
+const heroEmojis = ['👕','👗','🧥','👖','👟','👔','🧶','👜'];
+let heroIdx = 0;
+const heroCard = document.getElementById('hero-card');
+if (heroCard) {
+  setInterval(() => {
+    heroIdx = (heroIdx + 1) % heroEmojis.length;
+    heroCard.style.transition = 'transform 0.4s ease';
+    heroCard.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      heroCard.childNodes[0].textContent = heroEmojis[heroIdx];
+      heroCard.style.transform = 'scale(1)';
+    }, 200);
+  }, 3000);
+}
+</script>
+</body>
+</html>
